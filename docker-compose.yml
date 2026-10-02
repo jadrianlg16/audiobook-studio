@@ -1,0 +1,226 @@
+name: audiobook-studio
+
+# Shared bits for engine services. GPU engines add the `gpu` profile + device
+# reservation below.
+x-engine-common: &engine-common
+  restart: unless-stopped
+  environment:
+    HF_HOME: /cache
+  volumes:
+    - ${HF_CACHE_DIR:-./hf-cache}:/cache
+
+x-gpu: &gpu
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+# GPU engines load their model lazily (on first synthesis) so that engines you
+# don't use hold no VRAM — letting all of them show as "available" on one card.
+x-gpu-env: &gpu-env
+  HF_HOME: /cache
+  LAZY_LOAD: "1"
+  # Reduce CUDA memory fragmentation — helps the bigger models fit on an 8 GB card.
+  PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+  # Needed for gated models (e.g. Orpheus' canopylabs/orpheus-3b-0.1-ft). Accept
+  # the model's license on HuggingFace, then put your token in .env.
+  HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN:-}
+  HF_TOKEN: ${HUGGING_FACE_HUB_TOKEN:-}
+
+services:
+  # ---- Core (always on) -----------------------------------------------------
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    environment:
+      ENGINES: ${ENGINES:-}
+      # Serial by default — safe on a single shared GPU. Bump for CPU engines.
+      BAKEOFF_CONCURRENCY: ${BAKEOFF_CONCURRENCY:-1}
+      # Low-VRAM mode: free each engine's model after its bake-off synth. Pair
+      # with BAKEOFF_CONCURRENCY=1 to bake off heavy engines on a small GPU.
+      BAKEOFF_UNLOAD: ${BAKEOFF_UNLOAD:-0}
+      # First synth on a GPU engine may download multi-GB weights + warm up;
+      # give the proxy room before timing out.
+      REQUEST_TIMEOUT: ${REQUEST_TIMEOUT:-1800}
+      # AI director LLM backends. Ollama runs on the host; reach it via
+      # host.docker.internal. Gemini key is optional (the UI can supply it).
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      # Which local model directs by default. Per-machine, set it in .env.
+      DIRECTOR_MODEL: ${DIRECTOR_MODEL:-llama3.2}
+      # Optional: run a variant prompt without touching the built-in one.
+      DIRECTOR_PROMPT_PATH: ${DIRECTOR_PROMPT_PATH:-}
+      # /api/engines checks every registered engine at once. uvicorn runs on
+      # uvloop, whose DNS lookups share libuv's thread pool (4 threads by
+      # default), and a stopped engine's name takes ~2.6 s to fail inside
+      # Docker's DNS. With 8 engines registered and most stopped, the running
+      # one's lookup queued behind them and hit the 3 s health timeout, so it
+      # showed "unavailable" while up (2026-09-26). Keep this >= the number of
+      # registered engines.
+      UV_THREADPOOL_SIZE: ${UV_THREADPOOL_SIZE:-16}
+    ports:
+      - "${GATEWAY_PORT:-8080}:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - gateway
+    restart: unless-stopped
+
+  # The studio service: books, jobs, director passes, exports (docs/STUDIO-API.md).
+  # The UI is the `frontend` container on :5173; this is its API on :5174.
+  # Only needs the gateway + kokoro (CPU); books persist under ./output.
+  studio:
+    build:
+      context: ./pipeline
+      dockerfile: Dockerfile
+    environment:
+      AUDIOBOOK_GATEWAY: http://gateway:8000
+      AUDIOBOOK_OUTPUT: /data/books
+      # No-model modes. 1 = fake synth / canned direction: the same job kinds and
+      # the same pass shapes, with nothing loaded. Set both to 0 to run the real
+      # engines and the real director.
+      STUDIO_OFFLINE: ${STUDIO_OFFLINE:-0}
+      STUDIO_FAKE_DIRECTOR: ${STUDIO_FAKE_DIRECTOR:-0}
+      # Defaults for a new book; every one is editable in the UI's Settings.
+      STUDIO_NARRATOR_ENGINE: ${STUDIO_NARRATOR_ENGINE:-kokoro}
+      STUDIO_EXPRESSIVE_ENGINE: ${STUDIO_EXPRESSIVE_ENGINE:-breeze}
+      STUDIO_CASTING_MODE: ${STUDIO_CASTING_MODE:-narrator_only}
+      # Fallback director model when the gateway can't be asked for its default.
+      DIRECTOR_MODEL: ${DIRECTOR_MODEL:-gemma3:12b}
+      # The path prefix a browser uses to reach this service. nginx proxies
+      # /studio/ and strips it, so URLs the API hands back (line audio, exports)
+      # must carry it; the service also answers on it directly for :5174.
+      STUDIO_URL_PREFIX: ${STUDIO_URL_PREFIX:-/studio}
+    ports:
+      - "${STUDIO_PORT:-5174}:8000"
+    volumes:
+      - ./output:/data/books
+    depends_on:
+      - gateway
+    restart: unless-stopped
+
+  # ---- No-GPU engines (always on) -------------------------------------------
+  mock:
+    build:
+      context: .
+      dockerfile: engines/mock/Dockerfile
+    # Lazy so the gateway's BAKEOFF_UNLOAD=1 can't strand this CPU engine: a lazy
+    # engine reports available and reloads on demand, whereas an eager engine that
+    # gets unloaded after a bake-off stays unloaded → /health 503 → "unavailable".
+    environment:
+      LAZY_LOAD: "1"
+    restart: unless-stopped
+
+  kokoro:
+    <<: *engine-common
+    build:
+      context: .
+      dockerfile: engines/kokoro/Dockerfile
+    # Override engine-common's env to add LAZY_LOAD (keep HF_HOME). Lazy = always
+    # available + reload-on-demand, so BAKEOFF_UNLOAD=1 can't brick the baseline.
+    environment:
+      HF_HOME: /cache
+      LAZY_LOAD: "1"
+
+  # ---- GPU engines (opt-in: `docker compose --profile gpu up`) ---------------
+  chatterbox:
+    <<: [*engine-common, *gpu]
+    profiles: ["gpu"]
+    environment: *gpu-env
+    build:
+      context: .
+      dockerfile: engines/chatterbox/Dockerfile
+
+  styletts2:
+    <<: [*engine-common, *gpu]
+    profiles: ["gpu"]
+    environment: *gpu-env
+    build:
+      context: .
+      dockerfile: engines/styletts2/Dockerfile
+
+  orpheus:
+    <<: [*engine-common, *gpu]
+    profiles: ["gpu"]
+    environment: *gpu-env
+    build:
+      context: .
+      dockerfile: engines/orpheus/Dockerfile
+
+  indextts2:
+    <<: [*engine-common, *gpu]
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: engines/indextts2/Dockerfile
+    environment:
+      <<: *gpu-env
+      INDEXTTS_MODEL_DIR: /models/IndexTTS-2
+    volumes:
+      - ${HF_CACHE_DIR:-./hf-cache}:/cache
+      - ./models:/models
+
+  # Breeze TTS 2 — the only engine that takes a written performance note
+  # ("slowly, restrained") plus inline vocal events like (sigh).
+  #
+  # ⚠️ Weights are BreezeBlue Research & Non-Commercial and that covers
+  # self-hosted output: evaluation only. See engines/breeze/README.md.
+  #
+  # Needs ~7.7 GiB VRAM (12 GB recommended upstream) — an 8 GB card will likely
+  # OOM. Set BREEZE_SERVER_URL to drive a Breeze server on a bigger box instead.
+  # Download the checkpoint once on the host:
+  #   huggingface-cli download BreezeBlue/Breeze-TTS-2 --local-dir ./models/breeze-tts-2
+  breeze:
+    <<: [*engine-common, *gpu]
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: engines/breeze/Dockerfile
+    environment:
+      <<: *gpu-env
+      BREEZE_MODEL_DIR: /models/breeze-tts-2
+      BREEZE_SERVER_URL: ${BREEZE_SERVER_URL:-}
+      BREEZE_FAST: ${BREEZE_FAST:-0}
+    volumes:
+      - ${HF_CACHE_DIR:-./hf-cache}:/cache
+      - ./models:/models
+
+  # Qwen3-TTS (Alibaba Qwen) — nine named voices, each directable with a written
+  # performance note ("whispering, trembling with fear") sent as `instruct`.
+  # No cloning, no inline audio tags, no speed control (see its README).
+  #
+  # Licence: Apache-2.0 weights (Hugging Face model card metadata) and code; no
+  # clause on generated audio. A book routed here carries no licence note.
+  #
+  # VRAM: +4,860 MiB while loaded, measured on the 8 GB RTX 3060 (bf16, sdpa,
+  # 2026-09-27) — it fits beside the desktop, not beside Breeze. ~1.6x slower
+  # than real time there. Lazy like every GPU engine: 0 VRAM until first synth,
+  # and /unload gives it all back.
+  # Weights (~4.5 GB) land in the HF cache on first synth, or once ahead with:
+  #   docker compose --profile gpu run --rm --no-deps --entrypoint hf qwen3tts \
+  #     download Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice
+  qwen3tts:
+    <<: [*engine-common, *gpu]
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: engines/qwen3tts/Dockerfile
+    environment:
+      <<: *gpu-env
+      # A CustomVoice checkpoint: HF repo id (cached under HF_HOME) or a directory
+      # inside the container (e.g. under /cache).
+      QWEN_TTS_MODEL: ${QWEN_TTS_MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice}
+      # Used when a request names no voice. aiden = US male, English native.
+      QWEN_TTS_DEFAULT_VOICE: ${QWEN_TTS_DEFAULT_VOICE:-aiden}

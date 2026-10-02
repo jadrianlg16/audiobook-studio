@@ -1,0 +1,10 @@
+# This repo is developed on Windows and on a Mac. Without this, an editor or a
+# script that rewrites a file on Windows flips it to CRLF and the next diff shows
+# every line as changed, burying the real edit.
+* text=auto eol=lf
+
+# Keep shell scripts and Dockerfiles LF regardless of platform — CRLF breaks the
+# shebang inside a Linux container.
+*.sh   text eol=lf
+Dockerfile text eol=lf
+*.wav  binary

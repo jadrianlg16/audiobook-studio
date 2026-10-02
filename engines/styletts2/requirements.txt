@@ -1,0 +1,8 @@
+# styletts2 0.1.6 declares its full ML/audio stack itself (torch<3.0,
+# soundfile<0.13, nltk, gruut g2p, transformers<5, librosa<0.11, ...). So we add
+# ONLY the web server here — pinning those libs again just fights its own
+# constraints (that's what broke the earlier builds). The base image provides
+# torch 2.4.1, which satisfies styletts2's torch<3.0.
+styletts2==0.1.6
+fastapi==0.115.6
+uvicorn[standard]==0.34.0

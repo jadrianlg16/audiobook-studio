@@ -1,0 +1,10 @@
+# Test and e2e output (Vitest coverage, Playwright results and report).
+# e2e/axe-baseline.md is generated too (AXE_BASELINE_UPDATE=1 npm run e2e), but
+# committed on purpose: it is the accessibility baseline Phase 4 works down. A
+# normal e2e run writes its table to test-results/ instead.
+coverage/
+dist-e2e/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

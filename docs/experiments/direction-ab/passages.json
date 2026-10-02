@@ -1,0 +1,97 @@
+{
+  "about": "Passages for the direction A/B blind test (docs/experiments/direction-ab/README.md). Public-domain texts from Project Gutenberg, cut verbatim (paragraph line-wraps joined, underscores for italics removed, '--' as an em dash). 'register' is for analysis only; the listener never sees it.",
+  "passages": [
+    {
+      "id": "poe-telltale",
+      "text": "True!—nervous—very, very dreadfully nervous I had been and am; but why will you say that I am mad? The disease had sharpened my senses—not destroyed—not dulled them. Above all was the sense of hearing acute. I heard all things in the heaven and in the earth. I heard many things in hell. How, then, am I mad? Hearken! and observe how healthily—how calmly I can tell you the whole story.\n\nIt is impossible to say how first the idea entered my brain; but once conceived, it haunted me day and night. Object there was none. Passion there was none. I loved the old man. He had never wronged me. He had never given me insult.",
+      "register": "dread, feverish insistence",
+      "source": {
+        "title": "The Works of Edgar Allan Poe, Volume 2 (“The Tell-Tale Heart”)",
+        "author": "Edgar Allan Poe",
+        "gutenberg": 2148,
+        "url": "https://www.gutenberg.org/ebooks/2148"
+      },
+      "words": 115
+    },
+    {
+      "id": "dickens-scrooge-joy",
+      "text": "\"I don't know what to do!\" cried Scrooge, laughing and crying in the same breath; and making a perfect Laocoön of himself with his stockings. \"I am as light as a feather, I am as happy as an angel, I am as merry as a schoolboy. I am as giddy as a drunken man. A merry Christmas to everybody! A happy New Year to all the world. Hallo here! Whoop! Hallo!\"\n\nHe had frisked into the sitting-room, and was now standing there: perfectly winded.",
+      "register": "giddy joy",
+      "source": {
+        "title": "A Christmas Carol",
+        "author": "Charles Dickens",
+        "gutenberg": 46,
+        "url": "https://www.gutenberg.org/ebooks/46"
+      },
+      "words": 84
+    },
+    {
+      "id": "dickens-cratchit-grief",
+      "text": "Bob was very cheerful with them, and spoke pleasantly to all the family. He looked at the work upon the table, and praised the industry and speed of Mrs. Cratchit and the girls. They would be done long before Sunday, he said.\n\n\"Sunday! You went to-day, then, Robert?\" said his wife.\n\n\"Yes, my dear,\" returned Bob. \"I wish you could have gone. It would have done you good to see how green a place it is. But you'll see it often. I promised him that I would walk there on a Sunday. My little, little child!\" cried Bob. \"My little child!\"\n\nHe broke down all at once. He couldn't help it.",
+      "register": "grief breaking through",
+      "source": {
+        "title": "A Christmas Carol",
+        "author": "Charles Dickens",
+        "gutenberg": 46,
+        "url": "https://www.gutenberg.org/ebooks/46"
+      },
+      "words": 111
+    },
+    {
+      "id": "bronte-jane-defiance",
+      "text": "“I tell you I must go!” I retorted, roused to something like passion. “Do you think I can stay to become nothing to you? Do you think I am an automaton?—a machine without feelings? and can bear to have my morsel of bread snatched from my lips, and my drop of living water dashed from my cup? Do you think, because I am poor, obscure, plain, and little, I am soulless and heartless? You think wrong!—I have as much soul as you,—and full as much heart!",
+      "register": "passionate defiance",
+      "source": {
+        "title": "Jane Eyre",
+        "author": "Charlotte Brontë",
+        "gutenberg": 1260,
+        "url": "https://www.gutenberg.org/ebooks/1260"
+      },
+      "words": 86
+    },
+    {
+      "id": "stoker-dracula-welcome",
+      "text": "The old man motioned me in with his right hand with a courtly gesture, saying in excellent English, but with a strange intonation:—\n\n“Welcome to my house! Enter freely and of your own will!” He made no motion of stepping to meet me, but stood like a statue, as though his gesture of welcome had fixed him into stone. The instant, however, that I had stepped over the threshold, he moved impulsively forward, and holding out his hand grasped mine with a strength which made me wince, an effect which was not lessened by the fact that it seemed as cold as ice—more like the hand of a dead than a living man.",
+      "register": "uneasy, eerie",
+      "source": {
+        "title": "Dracula",
+        "author": "Bram Stoker",
+        "gutenberg": 345,
+        "url": "https://www.gutenberg.org/ebooks/345"
+      },
+      "words": 113
+    },
+    {
+      "id": "austen-bennet-wit",
+      "text": "It is a truth universally acknowledged, that a single man in possession of a good fortune must be in want of a wife.\n\nHowever little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is so well fixed in the minds of the surrounding families, that he is considered as the rightful property of some one or other of their daughters.\n\n“My dear Mr. Bennet,” said his lady to him one day, “have you heard that Netherfield Park is let at last?”\n\nMr. Bennet replied that he had not.\n\n“But it is,” returned she; “for Mrs. Long has just been here, and she told me all about it.”\n\nMr. Bennet made no answer.\n\n“Do not you want to know who has taken it?” cried his wife, impatiently.\n\n“You want to tell me, and I have no objection to hearing it.”",
+      "register": "dry irony, light comedy",
+      "source": {
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        "gutenberg": 1342,
+        "url": "https://www.gutenberg.org/ebooks/1342"
+      },
+      "words": 150
+    },
+    {
+      "id": "repo-lighthouse-resolve",
+      "text": "Rain hammered the windows as Elara climbed the last of the stairs. The lamp room was dark and cold.\n\n\"You let it go out,\" she said.\n\nMarcus did not look up. \"The oil ran dry an hour ago,\" he answered. \"There was nothing I could do.\"\n\n\"Then we signal by hand,\" Elara replied. \"Fetch the mirrors.\"\n\nHe finally turned to face her. \"In this storm? No ship will ever see us.\"\n\n\"They will see us,\" she said. \"Because we are going to make them see.\"\n\nMarcus was quiet for a long moment. \"You always did believe in impossible things.\"",
+      "register": "tense, stubborn resolve",
+      "source": {
+        "title": "pipeline/samples/dialogue.txt",
+        "author": "repo sample"
+      },
+      "words": 99
+    },
+    {
+      "id": "repo-cold-lantern-storm",
+      "text": "The storm had been promised for three days, and on the third it finally came. Dr. Vane climbed the tower stairs with the slow patience of a man who had climbed them ten thousand times before. At the top, the great lamp waited, unlit.\n\n\"You knew the light would go out,\" Elara said. She did not turn from the window.\n\n\"I knew nothing of the sort,\" he answered. It was 4:15 in the morning, and the sea was the color of iron.",
+      "register": "somber, weary",
+      "source": {
+        "title": "pipeline/samples/sample.txt",
+        "author": "repo sample"
+      },
+      "words": 82
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+# Keep Docker build contexts small. The gateway + engine images build from the
+# repo ROOT (context: .) but only COPY shared/ + their own engine dir. Everything
+# excluded here is multi-GB model weights, generated audio, or host-only tooling
+# that must NOT be shipped to the Docker daemon — without this, every rebuild
+# transfers ~14 GB and crawls or fails.
+
+# Model weights & caches (~11 GB + ~3.4 GB)
+models/
+hf-cache/
+
+# Generated audio + audiobook output
+output/
+test-output/
+*.wav
+
+# Host-only pipeline tooling — not part of any image
+pipeline/
+
+# The frontend image builds from ./frontend with its own .dockerignore; the
+# root-context images never copy it (and node_modules here would be huge).
+frontend/
+
+# Python / build caches & local venvs
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+gwvenv/
+
+# VCS & secrets
+.git/
+.env

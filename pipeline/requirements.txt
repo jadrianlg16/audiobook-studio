@@ -1,0 +1,11 @@
+# Web wrapper only. The pipeline itself is stdlib + pydantic.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-multipart==0.0.20
+
+# EPUB ingest (pipeline/ingest.py). BeautifulSoup is used with the stdlib
+# html.parser backend, not lxml — ebooklib pulls lxml in transitively for its
+# own OPF/NCX parsing, but we don't depend on it directly.
+ebooklib==0.20
+beautifulsoup4==4.15.0

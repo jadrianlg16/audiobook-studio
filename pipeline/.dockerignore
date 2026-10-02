@@ -1,0 +1,6 @@
+# Build context is ./pipeline. Keep it lean.
+output/
+**/__pycache__/
+*.py[cod]
+.cache/
+tests/

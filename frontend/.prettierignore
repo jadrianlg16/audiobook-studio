@@ -1,0 +1,10 @@
+dist/
+dist-e2e/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+package-lock.json
+# Written by the e2e run (e2e/axe-baseline.ts), not by hand.
+e2e/axe-baseline.md

@@ -1,0 +1,26 @@
+# The image only runs `npm ci` + `vite build` (see Dockerfile): anything the
+# production bundle does not import stays out of the build context.
+node_modules
+dist
+dist-e2e
+.vite
+
+# Tests, e2e and their output
+coverage
+test-results
+playwright-report
+blob-report
+e2e
+src/test
+**/*.test.ts
+**/*.test.tsx
+playwright.config.ts
+vitest.config.ts
+
+# Local tooling config and scripts (the image never regenerates the API types)
+scripts
+.gitignore
+eslint.config.js
+.prettierrc.json
+.prettierignore
+tsconfig.node.json

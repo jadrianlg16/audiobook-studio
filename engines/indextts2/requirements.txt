@@ -1,0 +1,8 @@
+# The indextts package (installed from GitHub in the Dockerfile) declares its own
+# ML/audio stack. Keep this list minimal — just the web server plus librosa/
+# soundfile (used directly in tts.py), left UNPINNED so they resolve to whatever
+# index-tts needs. Pinning numpy/soundfile here breaks resolution.
+librosa
+soundfile
+fastapi==0.115.6
+uvicorn[standard]==0.34.0

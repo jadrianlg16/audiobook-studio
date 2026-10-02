@@ -1,0 +1,8 @@
+# Only the thin server layer. The Dockerfile installs qwen-tts==0.1.1 in the same
+# pip call, and it brings its own ML stack (transformers==4.57.3,
+# accelerate==1.12.0, librosa, soundfile, einops, onnxruntime, gradio, sox).
+# torch / torchaudio / torchvision come from the base image and are held there
+# by a constraint file, so nothing here may pull a different torch.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4

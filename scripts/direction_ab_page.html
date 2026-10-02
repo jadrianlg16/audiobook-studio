@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blind listening test</title>
+<!-- Served by `python scripts/direction_ab.py serve`. It knows only random take
+     names; which take is which lives in key.json, outside the served folder. -->
+<style>
+  :root {
+    --bg: #f6f4ef; --panel: #ffffff; --ink: #1d1b18; --ink-soft: #5d574d;
+    --rule: #8f877a; --accent: #7a4b00; --accent-bg: #fbf1de; --focus: #1f5fa8;
+    --ok: #1f6b3a;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151412; --panel: #1f1d1a; --ink: #eeeae2; --ink-soft: #b3ab9d;
+      --rule: #7b7468; --accent: #f0b35a; --accent-bg: #2b2418; --focus: #8ab8ff;
+      --ok: #7fd49a;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 0 0 12px; }
+  .meta { color: var(--ink-soft); margin: 0 0 20px; }
+  .panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px; }
+  .passage { font-family: Georgia, "Times New Roman", serif; font-size: 1.05rem; white-space: pre-wrap;
+    border-left: 3px solid var(--rule); padding-left: 14px; margin: 0 0 20px; }
+  .takes { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; margin-bottom: 20px; }
+  @media (max-width: 620px) { .takes { grid-template-columns: 1fr; } }
+  .take { border: 1px solid var(--rule); border-radius: 8px; padding: 12px; }
+  .take h3 { margin: 0 0 8px; font-size: 1rem; }
+  audio { width: 100%; }
+  .played { color: var(--ok); font-size: 0.9rem; min-height: 1.4em; margin: 6px 0 0; }
+  fieldset { border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; margin: 0 0 16px; }
+  legend { font-weight: 600; padding: 0 6px; }
+  fieldset[disabled] { opacity: 0.55; }
+  .choices { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .choices label { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; }
+  .rate-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 4px 0; }
+  .rate-row span.who { min-width: 4.5em; font-weight: 600; }
+  .hint { color: var(--ink-soft); font-size: 0.92rem; margin: 6px 0 0; }
+  .note { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 8px;
+    padding: 12px 14px; margin: 0 0 12px; font-style: italic; }
+  textarea { width: 100%; min-height: 64px; font: inherit; color: inherit; background: transparent;
+    border: 1px solid var(--rule); border-radius: 6px; padding: 8px; }
+  button { font: inherit; min-height: 40px; padding: 8px 16px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--rule); background: var(--panel); color: var(--ink); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .status { color: var(--ink-soft); font-size: 0.9rem; min-height: 1.4em; margin-top: 12px; }
+  .intro li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite">
+  <p>Loading the trials…</p>
+</main>
+<script>
+"use strict";
+const app = document.getElementById("app");
+let trials = [];
+let answers = {};
+let index = -1; // -1 = intro
+let saveTimer = null;
+
+async function load() {
+  const res = await fetch("trials.json", { cache: "no-store" });
+  trials = (await res.json()).trials;
+  try {
+    const saved = await (await fetch("/api/results", { cache: "no-store" })).json();
+    answers = saved.answers || {};
+  } catch { answers = {}; }
+  render();
+}
+
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const status = document.getElementById("status");
+    try {
+      await fetch("/api/results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers }),
+      });
+      if (status) status.textContent = "Saved.";
+    } catch {
+      if (status) status.textContent = "Could not save — is the server still running?";
+    }
+  }, 250);
+}
+
+const answerFor = (t) => (answers[t.trial] ||= { keep: null, ratings: [null, null], follows: null, played: [false, false], comment: "" });
+const partTrials = (p) => trials.filter((t) => t.part === p);
+const complete = (t) => { const a = answers[t.trial]; return a && a.keep !== null && a.ratings.every((r) => r !== null); };
+
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, "");
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const k of kids.flat()) n.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  return n;
+}
+
+function radioGroup(name, options, current, onPick, spoken = (label) => label) {
+  return el("div", { class: "choices" }, options.map(([value, label]) =>
+    el("label", {},
+      el("input", { type: "radio", name, value: String(value), checked: current === value,
+        "aria-label": spoken(label), onchange: () => onPick(value) }),
+      label)));
+}
+
+function intro() {
+  const done = trials.filter(complete).length;
+  app.replaceChildren(
+    el("h1", { tabindex: "-1", id: "top" }, "Blind listening test"),
+    el("p", { class: "meta" }, `${partTrials(1).length} passages · ${done} of ${trials.length} answered`),
+    el("div", { class: "panel intro" },
+      el("p", {}, "Each passage is read twice. The two takes differ in one hidden way. Listen to both, then answer."),
+      el("ul", {},
+        el("li", {}, "Pick the take you would keep in a finished audiobook."),
+        el("li", {}, "Rate each take from 1 (unusable) to 5 (would keep as is)."),
+        el("li", {}, "In part 1 you can then read a performance note and say which take follows it."),
+        el("li", {}, "Headphones help. Takes are matched for loudness, so louder is not a clue."),
+        el("li", {}, "Answers save as you go; you can stop and come back.")),
+      el("p", { class: "hint" }, "Part 2 is optional: the same passages again, with a different pair of takes."),
+      el("div", { class: "nav" }, el("span"),
+        el("button", { class: "primary", onclick: () => go(firstOpen()) }, done ? "Continue" : "Start"))));
+  document.getElementById("top").focus();
+}
+
+function firstOpen() {
+  const i = trials.findIndex((t) => !complete(t));
+  return i === -1 ? trials.length : i;
+}
+
+function finished() {
+  const p1 = partTrials(1).filter(complete).length;
+  const p2 = partTrials(2).filter(complete).length;
+  app.replaceChildren(
+    el("h1", { tabindex: "-1", id: "top" }, "Thank you"),
+    el("div", { class: "panel" },
+      el("p", {}, `Part 1: ${p1} of ${partTrials(1).length} answered. Part 2: ${p2} of ${partTrials(2).length}.`),
+      el("p", {}, "Your answers are saved. Run `python scripts/direction_ab.py score` to unblind and score them."),
+      el("div", { class: "nav" }, el("button", { onclick: () => go(trials.length - 1) }, "Back"), el("span"))));
+  document.getElementById("top").focus();
+}
+
+function trialView(t, i) {
+  const a = answerFor(t);
+  const partList = partTrials(t.part);
+  const pos = partList.indexOf(t) + 1;
+  const bothPlayed = a.played[0] && a.played[1];
+  const takes = t.takes.map((src, k) => {
+    const audio = el("audio", { controls: true, preload: "auto", src, "aria-label": `Take ${k + 1}` });
+    const mark = el("p", { class: "played" }, a.played[k] ? "Played" : "");
+    audio.addEventListener("play", () => {
+      if (!a.played[k]) { a.played[k] = true; mark.textContent = "Played"; save(); maybeEnable(); }
+    });
+    audio.addEventListener("play", () => document.querySelectorAll("audio").forEach((o) => { if (o !== audio) o.pause(); }));
+    return el("div", { class: "take" }, el("h3", {}, `Take ${k + 1}`), audio, mark);
+  });
+
+  const keepSet = el("fieldset", { disabled: !bothPlayed },
+    el("legend", {}, "Which take would you keep in the audiobook?"),
+    radioGroup(`keep-${t.trial}`, [[0, "Take 1"], [1, "Take 2"]], a.keep, (v) => { a.keep = v; save(); refreshNav(); }),
+    bothPlayed ? "" : el("p", { class: "hint" }, "Play both takes first."));
+
+  const rateSet = el("fieldset", { disabled: !bothPlayed },
+    el("legend", {}, "How good is each take? 1 = unusable, 5 = keep as is"),
+    [0, 1].map((k) => el("div", { class: "rate-row" }, el("span", { class: "who" }, `Take ${k + 1}`),
+      radioGroup(`rate-${t.trial}-${k}`, [1, 2, 3, 4, 5].map((n) => [n, String(n)]), a.ratings[k],
+        (v) => { a.ratings[k] = v; save(); refreshNav(); }, (n) => `Take ${k + 1}: ${n} of 5`))));
+
+  const followSlot = el("div");
+  if (t.part === 1) {
+    const showNote = () => {
+      followSlot.replaceChildren(
+        el("div", { class: "note" }, el("strong", {}, "Performance note: "), t.note),
+        el("fieldset", {},
+          el("legend", {}, "Which take follows this note better?"),
+          radioGroup(`follows-${t.trial}`, [[0, "Take 1"], [1, "Take 2"], ["cant_tell", "Can't tell"]], a.follows,
+            (v) => { a.follows = v; save(); })));
+    };
+    if (a.follows !== null) showNote();
+    else followSlot.append(el("button", { disabled: !(a.keep !== null), id: "reveal", onclick: showNote },
+      "Show the performance note"));
+  }
+
+  const comment = el("textarea", { id: `c-${t.trial}`, oninput: (e) => { a.comment = e.target.value; save(); } });
+  comment.value = a.comment || "";
+
+  const next = el("button", { class: "primary", id: "next", disabled: !complete(t), onclick: () => go(i + 1) },
+    i + 1 < trials.length ? "Next" : "Finish");
+
+  function maybeEnable() {
+    if (a.played[0] && a.played[1]) {
+      keepSet.disabled = false; rateSet.disabled = false;
+      keepSet.querySelector(".hint")?.remove();
+    }
+  }
+  function refreshNav() {
+    next.disabled = !complete(t);
+    const r = document.getElementById("reveal");
+    if (r) r.disabled = a.keep === null;
+  }
+
+  app.replaceChildren(
+    el("h1", { tabindex: "-1", id: "top" }, `Part ${t.part} · passage ${pos} of ${partList.length}`),
+    el("p", { class: "meta" }, t.part === 1 ? "Two takes of the same passage." : "Optional part: another pair of takes of the same passage."),
+    el("div", { class: "panel" },
+      el("p", { class: "passage" }, t.text),
+      el("div", { class: "takes" }, takes),
+      keepSet, rateSet, followSlot,
+      el("label", { for: `c-${t.trial}` }, "Anything you noticed (optional)"), comment,
+      el("div", { class: "nav" },
+        el("button", { onclick: () => go(i - 1) }, i === 0 ? "Instructions" : "Back"), next),
+      el("p", { class: "status", id: "status", role: "status" })));
+  document.getElementById("top").focus();
+}
+
+function go(i) {
+  document.querySelectorAll("audio").forEach((a) => a.pause());
+  index = Math.max(-1, Math.min(i, trials.length));
+  render();
+  window.scrollTo(0, 0);
+}
+
+function render() {
+  if (index < 0) intro();
+  else if (index >= trials.length) finished();
+  else trialView(trials[index], index);
+}
+
+load().catch((e) => { app.textContent = `Could not load the trials: ${e}`; });
+</script>
+</body>
+</html>

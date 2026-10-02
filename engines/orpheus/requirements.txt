@@ -1,0 +1,5 @@
+# vLLM + torch come from the vllm/vllm-openai base image (do NOT reinstall them).
+# orpheus-speech pulls snac and uses the base's vLLM. uvicorn serves our FastAPI
+# app (fastapi itself is already present in the vLLM image).
+orpheus-speech==0.1.0
+uvicorn[standard]

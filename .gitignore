@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+.vite/
+
+# Model weights & caches (never commit multi-GB checkpoints)
+models/
+weights/
+.cache/
+hf-cache/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+
+# Generated audio + audiobook output folders
+out/
+output/
+# Scratch renders from verification runs. .dockerignore already treats this
+# as generated; only its *.wav were ignored here, so book/manifest files kept
+# showing up as untracked.
+test-output/
+*.wav
+# Exported audiobooks and render caches. Studio books live under output/, but the
+# CLI can write a book anywhere with --out; offline (fake-synth) renders cache
+# into .cache-offline/ next to the real .cache/.
+*.m4b
+*.mp3
+.cache-offline/
+
+# Env & local
+.env
+.DS_Store
+desktop.ini

@@ -1,0 +1,4596 @@
+{
+  "components": {
+    "schemas": {
+      "Attribution": {
+        "description": "Where ``Utterance.speaker`` came from, and how much to trust it.\n\nA wrong speaker is invisible — it sounds like a perfectly good take in the\nwrong voice — while an ``Unknown`` is a work item somebody can see. So the\nattributor records *why* it decided, and abstains (speaker ``\"Unknown\"``)\nwhen the basis is weak: see ``attribute.ABSTAIN_BELOW``.\n\n``basis``:\n  - ``tag``          an explicit ``\"…\" said X`` / ``X said, \"…\"`` / ``X: \"…\"``\n  - ``pronoun``      ``\"…\" she said`` resolved against the recent antecedent\n  - ``continuation`` the same speaker continuing inside one paragraph\n  - ``alternation``  back-and-forth across paragraphs (a guess, below the bar)\n  - ``manual``       a person reassigned the line (studio ``PATCH /lines/{id}``)\n  - ``none``         narration, or nothing to go on at all",
+        "properties": {
+          "basis": {
+            "default": "none",
+            "enum": [
+              "tag",
+              "pronoun",
+              "continuation",
+              "alternation",
+              "manual",
+              "none"
+            ],
+            "title": "Basis",
+            "type": "string"
+          },
+          "confidence": {
+            "default": 1.0,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          }
+        },
+        "required": [
+          "basis",
+          "confidence"
+        ],
+        "title": "Attribution",
+        "type": "object"
+      },
+      "AudioCounts": {
+        "properties": {
+          "cached": {
+            "default": 0,
+            "title": "Cached",
+            "type": "integer"
+          },
+          "missing": {
+            "default": 0,
+            "title": "Missing",
+            "type": "integer"
+          },
+          "stale": {
+            "default": 0,
+            "title": "Stale",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cached",
+          "stale",
+          "missing"
+        ],
+        "title": "AudioCounts",
+        "type": "object"
+      },
+      "AudioSpan": {
+        "description": "Filled after rendering. Powers the player timeline + incremental re-render.",
+        "properties": {
+          "cache_key": {
+            "title": "Cache Key",
+            "type": "string"
+          },
+          "end_ms": {
+            "title": "End Ms",
+            "type": "integer"
+          },
+          "sample_rate": {
+            "title": "Sample Rate",
+            "type": "integer"
+          },
+          "start_ms": {
+            "title": "Start Ms",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start_ms",
+          "end_ms",
+          "sample_rate",
+          "cache_key"
+        ],
+        "title": "AudioSpan",
+        "type": "object"
+      },
+      "Body_upload_book_api_books_upload_post": {
+        "properties": {
+          "author": {
+            "default": "",
+            "title": "Author",
+            "type": "string"
+          },
+          "book_type": {
+            "default": "auto",
+            "title": "Book Type",
+            "type": "string"
+          },
+          "casting_mode": {
+            "default": "",
+            "title": "Casting Mode",
+            "type": "string"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "voices": {
+            "default": "auto",
+            "title": "Voices",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_book_api_books_upload_post",
+        "type": "object"
+      },
+      "BookSummary": {
+        "properties": {
+          "audio": {
+            "$ref": "#/components/schemas/AudioCounts"
+          },
+          "author": {
+            "default": "",
+            "title": "Author",
+            "type": "string"
+          },
+          "book_type": {
+            "default": "unknown",
+            "title": "Book Type",
+            "type": "string"
+          },
+          "cast": {
+            "items": {
+              "$ref": "#/components/schemas/CastEntry"
+            },
+            "title": "Cast",
+            "type": "array"
+          },
+          "chapters": {
+            "default": 0,
+            "title": "Chapters",
+            "type": "integer"
+          },
+          "created_at": {
+            "default": "",
+            "title": "Created At",
+            "type": "string"
+          },
+          "directable": {
+            "$ref": "#/components/schemas/DirectableCounts"
+          },
+          "directed": {
+            "$ref": "#/components/schemas/DirectedCounts"
+          },
+          "duration_ms": {
+            "default": 0,
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "engines": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Engines",
+            "type": "object"
+          },
+          "est_minutes": {
+            "default": 0.0,
+            "title": "Est Minutes",
+            "type": "number"
+          },
+          "exportable": {
+            "default": false,
+            "title": "Exportable",
+            "type": "boolean"
+          },
+          "language": {
+            "default": "en",
+            "title": "Language",
+            "type": "string"
+          },
+          "last_job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "licence_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Licence Note"
+          },
+          "needs_render": {
+            "$ref": "#/components/schemas/NeedsRenderCounts"
+          },
+          "profile_label": {
+            "default": "",
+            "title": "Profile Label",
+            "type": "string"
+          },
+          "qc": {
+            "$ref": "#/components/schemas/QcCounts"
+          },
+          "rendered_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rendered At"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "status": {
+            "default": "idle",
+            "enum": [
+              "idle",
+              "rendering",
+              "directing",
+              "exporting",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "synthetic": {
+            "default": false,
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "default": "",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "utterances": {
+            "default": 0,
+            "title": "Utterances",
+            "type": "integer"
+          },
+          "words": {
+            "default": 0,
+            "title": "Words",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "author",
+          "book_type",
+          "profile_label",
+          "language",
+          "chapters",
+          "utterances",
+          "words",
+          "est_minutes",
+          "duration_ms",
+          "engines",
+          "directed",
+          "audio",
+          "cast",
+          "created_at",
+          "updated_at",
+          "rendered_at",
+          "last_job",
+          "status",
+          "licence_note",
+          "exportable",
+          "directable",
+          "needs_render",
+          "qc",
+          "synthetic"
+        ],
+        "title": "BookSummary",
+        "type": "object"
+      },
+      "CastEntry": {
+        "properties": {
+          "character": {
+            "title": "Character",
+            "type": "string"
+          },
+          "engine": {
+            "default": "kokoro",
+            "title": "Engine",
+            "type": "string"
+          },
+          "notes": {
+            "default": "",
+            "title": "Notes",
+            "type": "string"
+          },
+          "voice_design": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Design"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "character",
+          "voice_id",
+          "engine",
+          "notes",
+          "voice_design"
+        ],
+        "title": "CastEntry",
+        "type": "object"
+      },
+      "CastMergeRequest": {
+        "properties": {
+          "from": {
+            "minLength": 1,
+            "title": "From",
+            "type": "string"
+          },
+          "into": {
+            "minLength": 1,
+            "title": "Into",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "into"
+        ],
+        "title": "CastMergeRequest",
+        "type": "object"
+      },
+      "CastPatchEntry": {
+        "additionalProperties": false,
+        "description": "One row of ``PATCH /cast``. Absent fields are left alone.\n\n``create`` exists because a name the book\ndoes not have is a typo far more often than it is a new character, so it is\na 404 unless the caller says it meant it.",
+        "properties": {
+          "character": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Character",
+            "type": "string"
+          },
+          "create": {
+            "default": false,
+            "title": "Create",
+            "type": "boolean"
+          },
+          "engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Engine"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Notes"
+          },
+          "voice_design": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Voice Design"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "character"
+        ],
+        "title": "CastPatchEntry",
+        "type": "object"
+      },
+      "CastSummary": {
+        "properties": {
+          "cast": {
+            "items": {
+              "$ref": "#/components/schemas/CastEntry"
+            },
+            "title": "Cast",
+            "type": "array"
+          },
+          "first_line": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "First Line",
+            "type": "object"
+          },
+          "lines": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Lines",
+            "type": "object"
+          },
+          "shared_voices": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Shared Voices",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cast",
+          "lines",
+          "first_line",
+          "shared_voices"
+        ],
+        "title": "CastSummary",
+        "type": "object"
+      },
+      "CastingRequest": {
+        "properties": {
+          "expressive_engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expressive Engine"
+          },
+          "mode": {
+            "enum": [
+              "narrator_only",
+              "dialogue_expressive",
+              "all_expressive"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "CastingRequest",
+        "type": "object"
+      },
+      "Chapter": {
+        "properties": {
+          "audio": {
+            "$ref": "#/components/schemas/AudioCounts"
+          },
+          "audio_file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio File"
+          },
+          "directed": {
+            "default": 0,
+            "title": "Directed",
+            "type": "integer"
+          },
+          "duration_ms": {
+            "default": 0,
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "fresh": {
+            "default": false,
+            "title": "Fresh",
+            "type": "boolean"
+          },
+          "include_in_audio": {
+            "default": true,
+            "title": "Include In Audio",
+            "type": "boolean"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "kind": {
+            "default": "chapter",
+            "enum": [
+              "chapter",
+              "front_matter",
+              "back_matter"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "lines": {
+            "default": 0,
+            "title": "Lines",
+            "type": "integer"
+          },
+          "qc_status": {
+            "default": "unheard",
+            "enum": [
+              "unheard",
+              "approved",
+              "pickups"
+            ],
+            "title": "Qc Status",
+            "type": "string"
+          },
+          "scenes": {
+            "items": {
+              "$ref": "#/components/schemas/Scene"
+            },
+            "title": "Scenes",
+            "type": "array"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "title",
+          "scenes",
+          "audio_file",
+          "duration_ms",
+          "lines",
+          "directed",
+          "audio",
+          "fresh",
+          "kind",
+          "include_in_audio",
+          "qc_status"
+        ],
+        "title": "Chapter",
+        "type": "object"
+      },
+      "ChapterPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "include_in_audio": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include In Audio"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "chapter",
+                  "front_matter",
+                  "back_matter"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "qc_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "unheard",
+                  "approved",
+                  "pickups"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qc Status"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "ChapterPatch",
+        "type": "object"
+      },
+      "DecideRequest": {
+        "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/Decision"
+            },
+            "title": "Decisions",
+            "type": "array"
+          }
+        },
+        "title": "DecideRequest",
+        "type": "object"
+      },
+      "Decision": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "accepted",
+              "edited",
+              "rejected",
+              "kept_text"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instruction"
+          },
+          "scene_id": {
+            "title": "Scene Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scene_id",
+          "decision"
+        ],
+        "title": "Decision",
+        "type": "object"
+      },
+      "DirectRequest": {
+        "properties": {
+          "chapters": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chapters"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ollama",
+                  "gemini"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "scenes": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenes"
+          },
+          "scope": {
+            "default": "all",
+            "enum": [
+              "all",
+              "undirected",
+              "chapters",
+              "scenes"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "target_engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Engine"
+          }
+        },
+        "title": "DirectRequest",
+        "type": "object"
+      },
+      "DirectableCounts": {
+        "description": "Lines routed to an engine that declares ``instruction`` — what a director\npass can actually stamp. ``POST /direct`` is a 409 when ``lines`` is 0.",
+        "properties": {
+          "lines": {
+            "default": 0,
+            "title": "Lines",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lines",
+          "total"
+        ],
+        "title": "DirectableCounts",
+        "type": "object"
+      },
+      "DirectedCounts": {
+        "properties": {
+          "directed": {
+            "default": 0,
+            "title": "Directed",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "directed",
+          "total"
+        ],
+        "title": "DirectedCounts",
+        "type": "object"
+      },
+      "DirectorSettings-Input": {
+        "properties": {
+          "model": {
+            "default": "",
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "default": "ollama",
+            "enum": [
+              "ollama",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "title": "DirectorSettings",
+        "type": "object"
+      },
+      "DirectorSettings-Output": {
+        "properties": {
+          "model": {
+            "default": "",
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "default": "ollama",
+            "enum": [
+              "ollama",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "model"
+        ],
+        "title": "DirectorSettings",
+        "type": "object"
+      },
+      "EngineOption": {
+        "properties": {
+          "audio_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Audio Tags",
+            "type": "array"
+          },
+          "available": {
+            "default": false,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "instruction": {
+            "default": false,
+            "title": "Instruction",
+            "type": "boolean"
+          },
+          "license": {
+            "default": "",
+            "title": "License",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "non_commercial": {
+            "default": false,
+            "title": "Non Commercial",
+            "type": "boolean"
+          },
+          "voices": {
+            "items": {
+              "$ref": "#/components/schemas/VoiceOption"
+            },
+            "title": "Voices",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "available",
+          "instruction",
+          "audio_tags",
+          "voices",
+          "license",
+          "non_commercial"
+        ],
+        "title": "EngineOption",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "description": "Every error the studio answers with, 4xx or 5xx: one human-readable line.\n\n``app.py`` flattens FastAPI's 422 list and wraps unhandled exceptions into\nthis same shape, so it is the only error body a client ever has to parse.",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ExportFile": {
+        "properties": {
+          "bitrate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate"
+          },
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "chapter": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chapter"
+          },
+          "checks": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "boolean"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checks"
+          },
+          "compliance": {
+            "anyOf": [
+              {
+                "enum": [
+                  "pass",
+                  "fail"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compliance"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "loudness": {
+            "default": "acx",
+            "title": "Loudness",
+            "type": "string"
+          },
+          "measured": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measured"
+          },
+          "sample_rate": {
+            "default": 44100,
+            "title": "Sample Rate",
+            "type": "integer"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "url",
+          "bytes",
+          "created_at",
+          "format",
+          "loudness",
+          "sample_rate",
+          "chapter",
+          "duration_ms",
+          "bitrate",
+          "measured",
+          "checks",
+          "compliance"
+        ],
+        "title": "ExportFile",
+        "type": "object"
+      },
+      "ExportRequest": {
+        "properties": {
+          "bitrate": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{1,4}k$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "enum": [
+                  "m4b",
+                  "mp3",
+                  "wav",
+                  "acx"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format"
+          },
+          "loudness": {
+            "anyOf": [
+              {
+                "enum": [
+                  "acx",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loudness"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "maximum": 192000.0,
+                "minimum": 8000.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Rate"
+          }
+        },
+        "title": "ExportRequest",
+        "type": "object"
+      },
+      "ExportSettings-Input": {
+        "properties": {
+          "bitrate": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{1,4}k$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate"
+          },
+          "format": {
+            "default": "m4b",
+            "enum": [
+              "m4b",
+              "mp3",
+              "wav",
+              "acx"
+            ],
+            "title": "Format",
+            "type": "string"
+          },
+          "loudness": {
+            "default": "acx",
+            "enum": [
+              "acx",
+              "none"
+            ],
+            "title": "Loudness",
+            "type": "string"
+          },
+          "sample_rate": {
+            "default": 44100,
+            "maximum": 192000.0,
+            "minimum": 8000.0,
+            "title": "Sample Rate",
+            "type": "integer"
+          }
+        },
+        "title": "ExportSettings",
+        "type": "object"
+      },
+      "ExportSettings-Output": {
+        "properties": {
+          "bitrate": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{1,4}k$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate"
+          },
+          "format": {
+            "default": "m4b",
+            "enum": [
+              "m4b",
+              "mp3",
+              "wav",
+              "acx"
+            ],
+            "title": "Format",
+            "type": "string"
+          },
+          "loudness": {
+            "default": "acx",
+            "enum": [
+              "acx",
+              "none"
+            ],
+            "title": "Loudness",
+            "type": "string"
+          },
+          "sample_rate": {
+            "default": 44100,
+            "maximum": 192000.0,
+            "minimum": 8000.0,
+            "title": "Sample Rate",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "format",
+          "loudness",
+          "sample_rate",
+          "bitrate"
+        ],
+        "title": "ExportSettings",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "fake_director": {
+            "default": false,
+            "title": "Fake Director",
+            "type": "boolean"
+          },
+          "gateway": {
+            "default": "unreachable",
+            "enum": [
+              "ok",
+              "unreachable"
+            ],
+            "title": "Gateway",
+            "type": "string"
+          },
+          "offline": {
+            "default": false,
+            "title": "Offline",
+            "type": "boolean"
+          },
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "gateway",
+          "offline",
+          "fake_director"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "Intent": {
+        "description": "Engine-agnostic reading intent. An analyzer fills this in; Kokoro can't\nconsume it directly, so the renderer maps it onto voice/speed/pauses.",
+        "properties": {
+          "emotion": {
+            "default": "neutral",
+            "title": "Emotion",
+            "type": "string"
+          },
+          "intensity": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Intensity",
+            "type": "number"
+          },
+          "pace": {
+            "default": 1.0,
+            "exclusiveMinimum": 0.1,
+            "maximum": 3.0,
+            "title": "Pace",
+            "type": "number"
+          }
+        },
+        "required": [
+          "emotion",
+          "intensity",
+          "pace"
+        ],
+        "title": "Intent",
+        "type": "object"
+      },
+      "Job": {
+        "properties": {
+          "book": {
+            "title": "Book",
+            "type": "string"
+          },
+          "chapters": {
+            "items": {
+              "$ref": "#/components/schemas/JobChapter"
+            },
+            "title": "Chapters",
+            "type": "array"
+          },
+          "created_at": {
+            "default": "",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "render",
+              "direct",
+              "export"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "log": {
+            "items": {
+              "$ref": "#/components/schemas/JobLogEntry"
+            },
+            "title": "Log",
+            "type": "array"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/JobProgress"
+          },
+          "request": {
+            "additionalProperties": true,
+            "title": "Request",
+            "type": "object"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "default": "queued",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "done",
+              "failed",
+              "cancelled",
+              "interrupted"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "book",
+          "status",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "progress",
+          "error",
+          "result",
+          "chapters",
+          "log",
+          "request"
+        ],
+        "title": "Job",
+        "type": "object"
+      },
+      "JobChapter": {
+        "properties": {
+          "done": {
+            "default": 0,
+            "title": "Done",
+            "type": "integer"
+          },
+          "engines": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Engines",
+            "type": "object"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "seconds": {
+            "default": 0.0,
+            "title": "Seconds",
+            "type": "number"
+          },
+          "status": {
+            "default": "queued",
+            "enum": [
+              "queued",
+              "running",
+              "done",
+              "failed",
+              "skipped"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "index",
+          "title",
+          "done",
+          "total",
+          "status",
+          "seconds",
+          "engines"
+        ],
+        "title": "JobChapter",
+        "type": "object"
+      },
+      "JobLogEntry": {
+        "properties": {
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "ts": {
+            "title": "Ts",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ts",
+          "line"
+        ],
+        "title": "JobLogEntry",
+        "type": "object"
+      },
+      "JobProgress": {
+        "properties": {
+          "cache_hits": {
+            "default": 0,
+            "title": "Cache Hits",
+            "type": "integer"
+          },
+          "done": {
+            "default": 0,
+            "title": "Done",
+            "type": "integer"
+          },
+          "elapsed_s": {
+            "default": 0.0,
+            "title": "Elapsed S",
+            "type": "number"
+          },
+          "eta_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta S"
+          },
+          "rtf": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rtf"
+          },
+          "synth_calls": {
+            "default": 0,
+            "title": "Synth Calls",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "done",
+          "total",
+          "cache_hits",
+          "synth_calls",
+          "rtf",
+          "elapsed_s",
+          "eta_s"
+        ],
+        "title": "JobProgress",
+        "type": "object"
+      },
+      "JobSummary": {
+        "properties": {
+          "book": {
+            "title": "Book",
+            "type": "string"
+          },
+          "created_at": {
+            "default": "",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "render",
+              "direct",
+              "export"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/JobProgress"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "default": "queued",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "done",
+              "failed",
+              "cancelled",
+              "interrupted"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "book",
+          "status",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "progress",
+          "error",
+          "result"
+        ],
+        "title": "JobSummary",
+        "type": "object"
+      },
+      "LexiconPut": {
+        "properties": {
+          "entries": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Entries",
+            "type": "object"
+          }
+        },
+        "title": "LexiconPut",
+        "type": "object"
+      },
+      "LexiconView": {
+        "properties": {
+          "entries": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Entries",
+            "type": "object"
+          },
+          "global": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Global",
+            "type": "object"
+          },
+          "occurrences": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Occurrences",
+            "type": "object"
+          }
+        },
+        "required": [
+          "entries",
+          "global",
+          "occurrences"
+        ],
+        "title": "LexiconView",
+        "type": "object"
+      },
+      "Line": {
+        "properties": {
+          "attribution": {
+            "$ref": "#/components/schemas/Attribution"
+          },
+          "audio": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AudioSpan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "audio_state": {
+            "default": "missing",
+            "enum": [
+              "cached",
+              "stale",
+              "missing"
+            ],
+            "title": "Audio State",
+            "type": "string"
+          },
+          "chapter_index": {
+            "default": 0,
+            "title": "Chapter Index",
+            "type": "integer"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "flag": {
+            "default": false,
+            "title": "Flag",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/Intent"
+          },
+          "kind": {
+            "default": "narration",
+            "enum": [
+              "narration",
+              "dialogue",
+              "internal",
+              "letter",
+              "heading",
+              "verse"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "order": {
+            "default": 0,
+            "title": "Order",
+            "type": "integer"
+          },
+          "render": {
+            "$ref": "#/components/schemas/Render"
+          },
+          "scene_index": {
+            "default": 0,
+            "title": "Scene Index",
+            "type": "integer"
+          },
+          "speaker": {
+            "default": "Narrator",
+            "title": "Speaker",
+            "type": "string"
+          },
+          "text": {
+            "default": "",
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "order",
+          "chapter_index",
+          "scene_index",
+          "speaker",
+          "kind",
+          "text",
+          "intent",
+          "render",
+          "audio",
+          "audio_state",
+          "duration_ms",
+          "flag",
+          "note",
+          "attribution"
+        ],
+        "title": "Line",
+        "type": "object"
+      },
+      "LinePatch": {
+        "additionalProperties": false,
+        "description": "``PATCH /books/{slug}/lines/{id}``.\n\nEvery field is optional and ``None`` means \"clear\"; \"absent\" and \"null\" are\ntold apart by ``model_fields_set``, never by a falsy check — clearing an\ninstruction and not mentioning it are different requests. Range/type checks\nlive here so a bad value is a 422 *before* anything touches the script;\ncross-field checks (engine ↔ voice, spoken_text ↔ text ↔ tags) need the\nline and the engine catalog, so they live in ``validate.py``.",
+        "properties": {
+          "engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Engine"
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Flag"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Instruction"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Note"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Speaker"
+          },
+          "speed": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Speed"
+          },
+          "spoken_text": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Spoken Text"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Voice Id"
+          }
+        },
+        "title": "LinePatch",
+        "type": "object"
+      },
+      "LinePatchResult": {
+        "description": "``PATCH /books/{slug}/lines/{id}``: the line as it now stands, and the\nscript version that edit left (unchanged by a QC-only mark).",
+        "properties": {
+          "line": {
+            "$ref": "#/components/schemas/Line"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "line",
+          "version"
+        ],
+        "title": "LinePatchResult",
+        "type": "object"
+      },
+      "LineRenderResult": {
+        "description": "``POST /books/{slug}/lines/{id}/render``: the freshly cached line and the\nURL its take plays from.",
+        "properties": {
+          "audio_url": {
+            "title": "Audio Url",
+            "type": "string"
+          },
+          "line": {
+            "$ref": "#/components/schemas/Line"
+          }
+        },
+        "required": [
+          "line",
+          "audio_url"
+        ],
+        "title": "LineRenderResult",
+        "type": "object"
+      },
+      "NeedsRenderCounts": {
+        "description": "The two different reasons a book still owes you a render: lines whose\naudio is not cached, and chapters whose WAV does not reflect their lines.\nA single-line re-render empties the first and leaves the second — which is\nthe dead end the UI could not label before (Amendments v1.1).",
+        "properties": {
+          "chapters": {
+            "default": 0,
+            "title": "Chapters",
+            "type": "integer"
+          },
+          "lines": {
+            "default": 0,
+            "title": "Lines",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lines",
+          "chapters"
+        ],
+        "title": "NeedsRenderCounts",
+        "type": "object"
+      },
+      "NewBookRequest": {
+        "properties": {
+          "author": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Author",
+            "type": "string"
+          },
+          "book_type": {
+            "default": "auto",
+            "title": "Book Type",
+            "type": "string"
+          },
+          "casting_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "narrator_only",
+                  "dialogue_expressive",
+                  "all_expressive"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Casting Mode"
+          },
+          "text": {
+            "default": "",
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "voices": {
+            "default": "auto",
+            "enum": [
+              "auto",
+              "single",
+              "multi"
+            ],
+            "title": "Voices",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "NewBookRequest",
+        "type": "object"
+      },
+      "Pass": {
+        "description": "A director pass over a book. Persisted by the studio as passes/<id>.json.",
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "book": {
+            "default": "",
+            "title": "Book",
+            "type": "string"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/PassCounts"
+          },
+          "created_at": {
+            "default": "",
+            "title": "Created At",
+            "type": "string"
+          },
+          "elapsed_s": {
+            "default": 0.0,
+            "title": "Elapsed S",
+            "type": "number"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "default": "",
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "default": "",
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "provider": {
+            "default": "ollama",
+            "enum": [
+              "ollama",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "scenes": {
+            "items": {
+              "$ref": "#/components/schemas/PassScene"
+            },
+            "title": "Scenes",
+            "type": "array"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/PassScope"
+          },
+          "target_engine": {
+            "default": "",
+            "title": "Target Engine",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "book",
+          "created_at",
+          "finished_at",
+          "provider",
+          "model",
+          "prompt_version",
+          "target_engine",
+          "scope",
+          "counts",
+          "elapsed_s",
+          "scenes",
+          "applied_at"
+        ],
+        "title": "Pass",
+        "type": "object"
+      },
+      "PassApplyResult": {
+        "description": "``POST /books/{slug}/passes/{pass_id}/apply``.",
+        "properties": {
+          "pass": {
+            "$ref": "#/components/schemas/Pass"
+          },
+          "script": {
+            "$ref": "#/components/schemas/Script"
+          }
+        },
+        "required": [
+          "pass",
+          "script"
+        ],
+        "title": "PassApplyResult",
+        "type": "object"
+      },
+      "PassCounts": {
+        "properties": {
+          "error": {
+            "default": 0,
+            "title": "Error",
+            "type": "integer"
+          },
+          "ignored": {
+            "default": 0,
+            "title": "Ignored",
+            "type": "integer"
+          },
+          "kept": {
+            "default": 0,
+            "title": "Kept",
+            "type": "integer"
+          },
+          "rejected": {
+            "default": 0,
+            "title": "Rejected",
+            "type": "integer"
+          },
+          "scenes": {
+            "default": 0,
+            "title": "Scenes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kept",
+          "rejected",
+          "ignored",
+          "error",
+          "scenes"
+        ],
+        "title": "PassCounts",
+        "type": "object"
+      },
+      "PassScene": {
+        "description": "One scene's proposal. Mirrors ``PassScene`` in docs/STUDIO-API.md.",
+        "properties": {
+          "attempts": {
+            "default": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "chapter_index": {
+            "default": 0,
+            "title": "Chapter Index",
+            "type": "integer"
+          },
+          "chapter_title": {
+            "default": "",
+            "title": "Chapter Title",
+            "type": "string"
+          },
+          "decision": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "accepted",
+              "edited",
+              "rejected",
+              "kept_text"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "emotion": {
+            "default": "neutral",
+            "title": "Emotion",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "final_instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Instruction"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instruction"
+          },
+          "line_spoken_text": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Spoken Text"
+          },
+          "model_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Text"
+          },
+          "pace": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pace"
+          },
+          "prompt_version": {
+            "default": "",
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "scalar": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Scalar",
+            "type": "number"
+          },
+          "scene_id": {
+            "title": "Scene Id",
+            "type": "string"
+          },
+          "scene_index": {
+            "default": 0,
+            "title": "Scene Index",
+            "type": "integer"
+          },
+          "scene_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Note"
+          },
+          "source_text": {
+            "default": "",
+            "title": "Source Text",
+            "type": "string"
+          },
+          "status": {
+            "default": "ignored",
+            "enum": [
+              "kept",
+              "rejected",
+              "ignored",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "tags_status": {
+            "default": "none",
+            "enum": [
+              "kept",
+              "rejected",
+              "none"
+            ],
+            "title": "Tags Status",
+            "type": "string"
+          },
+          "tags_used": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Tags Used",
+            "type": "object"
+          }
+        },
+        "required": [
+          "scene_id",
+          "chapter_index",
+          "scene_index",
+          "chapter_title",
+          "status",
+          "instruction",
+          "tags_status",
+          "tags_used",
+          "source_text",
+          "model_text",
+          "line_spoken_text",
+          "summary",
+          "emotion",
+          "scalar",
+          "scene_note",
+          "pace",
+          "decision",
+          "final_instruction",
+          "attempts",
+          "error",
+          "reason",
+          "prompt_version"
+        ],
+        "title": "PassScene",
+        "type": "object"
+      },
+      "PassScope": {
+        "properties": {
+          "scenes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scenes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scenes"
+        ],
+        "title": "PassScope",
+        "type": "object"
+      },
+      "PassSummary": {
+        "description": "``GET /books/{slug}/passes``: a ``Pass`` without ``scenes``.",
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "book": {
+            "default": "",
+            "title": "Book",
+            "type": "string"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/PassCounts"
+          },
+          "created_at": {
+            "default": "",
+            "title": "Created At",
+            "type": "string"
+          },
+          "elapsed_s": {
+            "default": 0.0,
+            "title": "Elapsed S",
+            "type": "number"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "default": "",
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "default": "",
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "provider": {
+            "default": "ollama",
+            "enum": [
+              "ollama",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/PassScope"
+          },
+          "target_engine": {
+            "default": "",
+            "title": "Target Engine",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "book",
+          "created_at",
+          "finished_at",
+          "provider",
+          "model",
+          "prompt_version",
+          "target_engine",
+          "scope",
+          "counts",
+          "elapsed_s",
+          "applied_at"
+        ],
+        "title": "PassSummary",
+        "type": "object"
+      },
+      "QcCounts": {
+        "description": "Chapter sign-off tallies over the chapters that are in the audio.",
+        "properties": {
+          "approved": {
+            "default": 0,
+            "title": "Approved",
+            "type": "integer"
+          },
+          "chapters": {
+            "default": 0,
+            "title": "Chapters",
+            "type": "integer"
+          },
+          "pickups": {
+            "default": 0,
+            "title": "Pickups",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "approved",
+          "pickups",
+          "chapters"
+        ],
+        "title": "QcCounts",
+        "type": "object"
+      },
+      "Render": {
+        "description": "Concrete synthesis parameters — this is what becomes a SynthRequest.",
+        "properties": {
+          "direction_source": {
+            "default": "none",
+            "enum": [
+              "none",
+              "director",
+              "manual"
+            ],
+            "title": "Direction Source",
+            "type": "string"
+          },
+          "engine": {
+            "default": "kokoro",
+            "title": "Engine",
+            "type": "string"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instruction"
+          },
+          "lead_pause_ms": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Lead Pause Ms",
+            "type": "integer"
+          },
+          "speed": {
+            "default": 1.0,
+            "exclusiveMinimum": 0.1,
+            "maximum": 4.0,
+            "title": "Speed",
+            "type": "number"
+          },
+          "spoken_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spoken Text"
+          },
+          "trail_pause_ms": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Trail Pause Ms",
+            "type": "integer"
+          },
+          "voice_design": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Design"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "engine",
+          "voice_id",
+          "speed",
+          "lead_pause_ms",
+          "trail_pause_ms",
+          "instruction",
+          "spoken_text",
+          "direction_source",
+          "voice_design"
+        ],
+        "title": "Render",
+        "type": "object"
+      },
+      "RenderRequest": {
+        "properties": {
+          "chapters": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chapters"
+          },
+          "line_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Ids"
+          },
+          "scope": {
+            "default": "stale",
+            "enum": [
+              "all",
+              "stale",
+              "chapters",
+              "lines"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "RenderRequest",
+        "type": "object"
+      },
+      "RetryRequest": {
+        "properties": {
+          "scenes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scenes",
+            "type": "array"
+          }
+        },
+        "title": "RetryRequest",
+        "type": "object"
+      },
+      "Scene": {
+        "properties": {
+          "chapter_index": {
+            "title": "Chapter Index",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "line_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Line Ids",
+            "type": "array"
+          },
+          "scene_index": {
+            "title": "Scene Index",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "chapter_index",
+          "scene_index",
+          "line_ids"
+        ],
+        "title": "Scene",
+        "type": "object"
+      },
+      "Script": {
+        "properties": {
+          "book": {
+            "$ref": "#/components/schemas/BookSummary"
+          },
+          "cast": {
+            "items": {
+              "$ref": "#/components/schemas/CastEntry"
+            },
+            "title": "Cast",
+            "type": "array"
+          },
+          "chapters": {
+            "items": {
+              "$ref": "#/components/schemas/Chapter"
+            },
+            "title": "Chapters",
+            "type": "array"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "profile": {
+            "additionalProperties": true,
+            "title": "Profile",
+            "type": "object"
+          },
+          "version": {
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "book",
+          "version",
+          "profile",
+          "cast",
+          "chapters",
+          "lines"
+        ],
+        "title": "Script",
+        "type": "object"
+      },
+      "Settings": {
+        "properties": {
+          "book_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Book Types",
+            "type": "array"
+          },
+          "casting_mode": {
+            "default": "narrator_only",
+            "enum": [
+              "narrator_only",
+              "dialogue_expressive",
+              "all_expressive"
+            ],
+            "title": "Casting Mode",
+            "type": "string"
+          },
+          "director": {
+            "$ref": "#/components/schemas/DirectorSettings-Output"
+          },
+          "engines": {
+            "items": {
+              "$ref": "#/components/schemas/EngineOption"
+            },
+            "title": "Engines",
+            "type": "array"
+          },
+          "export": {
+            "$ref": "#/components/schemas/ExportSettings-Output"
+          },
+          "expressive_engine": {
+            "default": "breeze",
+            "title": "Expressive Engine",
+            "type": "string"
+          },
+          "fake_director": {
+            "default": false,
+            "title": "Fake Director",
+            "type": "boolean"
+          },
+          "ffmpeg": {
+            "default": false,
+            "title": "Ffmpeg",
+            "type": "boolean"
+          },
+          "gateway_url": {
+            "default": "",
+            "title": "Gateway Url",
+            "type": "string"
+          },
+          "narrator_engine": {
+            "default": "kokoro",
+            "title": "Narrator Engine",
+            "type": "string"
+          },
+          "offline": {
+            "default": false,
+            "title": "Offline",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "offline",
+          "fake_director",
+          "gateway_url",
+          "narrator_engine",
+          "expressive_engine",
+          "casting_mode",
+          "director",
+          "export",
+          "ffmpeg",
+          "book_types",
+          "engines"
+        ],
+        "title": "Settings",
+        "type": "object"
+      },
+      "SettingsPatch": {
+        "properties": {
+          "casting_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "narrator_only",
+                  "dialogue_expressive",
+                  "all_expressive"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Casting Mode"
+          },
+          "director": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DirectorSettings-Input"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "export": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExportSettings-Input"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expressive_engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expressive Engine"
+          },
+          "narrator_engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Narrator Engine"
+          }
+        },
+        "title": "SettingsPatch",
+        "type": "object"
+      },
+      "VersionEntry": {
+        "properties": {
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "saved_at": {
+            "title": "Saved At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "saved_at",
+          "note"
+        ],
+        "title": "VersionEntry",
+        "type": "object"
+      },
+      "VoiceOption": {
+        "description": "One named voice of an engine. A ``TypedDict`` rather than a model so the\ncatalog stays plain dicts (``validate.py`` reads ``v.get(\"id\")``) while the\nexport still names the two keys every voice has.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "VoiceOption",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Audiobook Studio",
+    "version": "1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "index__get",
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Index"
+      }
+    },
+    "/api/books": {
+      "get": {
+        "operationId": "list_books_api_books_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BookSummary"
+                  },
+                  "title": "Response List Books Api Books Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "List Books"
+      },
+      "post": {
+        "operationId": "create_book_api_books_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewBookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Create Book"
+      }
+    },
+    "/api/books/upload": {
+      "post": {
+        "operationId": "upload_book_api_books_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_book_api_books_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Upload Book"
+      }
+    },
+    "/api/books/{slug}": {
+      "delete": {
+        "description": "Cancel first, then delete, then forget the jobs.\n\nDeleting a book with a job in flight used to be a race the client never\nheard about: 204, folder gone, and a few seconds later the dying job's\nfailure handler re-created ``output/<slug>/jobs/`` — an orphan folder no\nendpoint would ever mention again. Cancellation is\ncooperative, so this waits for the worker to acknowledge, bounded; the\njob records go with the book rather than lingering as ghosts in\n``GET /jobs``.",
+        "operationId": "delete_book_api_books__slug__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Delete Book"
+      },
+      "get": {
+        "operationId": "get_book_api_books__slug__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Book"
+      }
+    },
+    "/api/books/{slug}/cast": {
+      "get": {
+        "operationId": "get_cast_api_books__slug__cast_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CastSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Cast"
+      },
+      "patch": {
+        "operationId": "patch_cast_api_books__slug__cast_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/CastPatchEntry"
+                },
+                "type": "array"
+              }
+            }
+          },
+          "description": "Cast rows matched on `character`; absent fields are left alone.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Patch Cast"
+      }
+    },
+    "/api/books/{slug}/cast/merge": {
+      "post": {
+        "description": "Fold one character into another — the repair for a misattribution.\n\nEvery line of ``from`` becomes ``into`` and ``from`` leaves the cast, so\nan invented speaker (the attribution heuristic's favourite mistake) is\none request to undo instead of one PATCH per line.",
+        "operationId": "merge_cast_api_books__slug__cast_merge_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CastMergeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Merge Cast"
+      }
+    },
+    "/api/books/{slug}/casting": {
+      "post": {
+        "operationId": "casting_api_books__slug__casting_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CastingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Casting"
+      }
+    },
+    "/api/books/{slug}/chapters/{index}": {
+      "patch": {
+        "description": "Rename a chapter, or take it out of the audiobook.\n\n``include_in_audio: false`` is the front-matter answer: the render skips\nit and the export leaves it out, so a copyright page stops being a\nchapter of read-aloud legalese *and* stops blocking export by never\nbeing fresh.",
+        "operationId": "patch_chapter_api_books__slug__chapters__index__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "title": "Index",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChapterPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chapter"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Patch Chapter"
+      }
+    },
+    "/api/books/{slug}/direct": {
+      "post": {
+        "description": "409 when the book has no line a written note could reach.\n\nA pass over a Kokoro-only book ran, reported success, was applied, and\nstamped exactly nothing — because ``apply_pass`` only touches\ninstruction-capable engines. Refusing up front costs a\nrequest; the old behaviour cost an LLM pass over the whole book and told\nyou nothing.",
+        "operationId": "direct_book_api_books__slug__direct_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DirectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Direct Book"
+      }
+    },
+    "/api/books/{slug}/export": {
+      "post": {
+        "description": "409 unless every chapter is fresh.\n\nMastering a book with a stale chapter produces a finished-looking .m4b\nthat contains a take the user already replaced — the kind of wrong that\nis only discovered by listening to the whole thing.",
+        "operationId": "export_book_api_books__slug__export_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Export Book"
+      }
+    },
+    "/api/books/{slug}/exports": {
+      "get": {
+        "operationId": "list_exports_api_books__slug__exports_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExportFile"
+                  },
+                  "title": "Response List Exports Api Books  Slug  Exports Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "List Exports"
+      }
+    },
+    "/api/books/{slug}/lexicon": {
+      "get": {
+        "operationId": "get_lexicon_api_books__slug__lexicon_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LexiconView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Lexicon"
+      },
+      "put": {
+        "operationId": "put_lexicon_api_books__slug__lexicon_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LexiconPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LexiconView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Put Lexicon"
+      }
+    },
+    "/api/books/{slug}/lines/{line_id}": {
+      "patch": {
+        "description": "Edit one line. Absent key = leave alone, ``null`` = clear.\n\nTwo rules from the contract that are easy to get backwards:\nediting ``text`` clears ``spoken_text`` (the tags were annotations of\nthe *old* words, so keeping them would send the engine a sentence the\nreader never sees), and touching ``instruction``/``spoken_text`` stamps\n``direction_source: \"manual\"`` so a later director pass leaves it alone;\nclearing both puts the line back to ``\"none\"``.\n\nEverything is validated **before** anything is assigned. The old handler\nmutated the model field by field and saved: pydantic does not re-validate\non attribute assignment, so ``{\"speed\": 99}`` was written out and then\nrejected on the next *load* — every later read of that book a 500, with\nno way back through the API. Here the merged render\nblock is re-validated by ``schema.Render`` itself, the engine and voice\nare checked against the catalog, and ``spoken_text`` has to be this\nline's text plus tags the engine actually understands.",
+        "operationId": "patch_line_api_books__slug__lines__line_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_id",
+            "required": true,
+            "schema": {
+              "title": "Line Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinePatch"
+              }
+            }
+          },
+          "description": "Any subset of the fields; an absent key is left alone, null clears.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinePatchResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Patch Line"
+      }
+    },
+    "/api/books/{slug}/lines/{line_id}/audio": {
+      "get": {
+        "operationId": "line_audio_api_books__slug__lines__line_id__audio_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_id",
+            "required": true,
+            "schema": {
+              "title": "Line Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "audio/wav": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The cached take at the line's current settings."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Line Audio"
+      }
+    },
+    "/api/books/{slug}/lines/{line_id}/render": {
+      "post": {
+        "description": "Synchronous single-line render — the \"hear it back in seconds\" loop.\n\n503 while a render job is running for this book: the job owns the cache\ndirectory's write path, and two writers racing on one key would be a\ntorn file that hashes as a valid take.",
+        "operationId": "render_line_api_books__slug__lines__line_id__render_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_id",
+            "required": true,
+            "schema": {
+              "title": "Line Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineRenderResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Render Line"
+      }
+    },
+    "/api/books/{slug}/passes": {
+      "get": {
+        "operationId": "list_passes_api_books__slug__passes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PassSummary"
+                  },
+                  "title": "Response List Passes Api Books  Slug  Passes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "List Passes"
+      }
+    },
+    "/api/books/{slug}/passes/{pass_id}": {
+      "get": {
+        "operationId": "get_pass_api_books__slug__passes__pass_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pass"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Pass"
+      }
+    },
+    "/api/books/{slug}/passes/{pass_id}/apply": {
+      "post": {
+        "description": "Commit the decided scenes. Idempotent, and manual lines are safe.\n\n``instruction_engines`` is the set of engines the *gateway* says accept a\nwritten note, so a hybrid book stamps only the lines that can hear one;\nwith no gateway it falls back to the pass's own target engine rather\nthan stamping every line in the book.",
+        "operationId": "apply_api_books__slug__passes__pass_id__apply_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassApplyResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Apply"
+      }
+    },
+    "/api/books/{slug}/passes/{pass_id}/decide": {
+      "post": {
+        "description": "Record decisions only. Nothing reaches the book until ``apply``.",
+        "operationId": "decide_api_books__slug__passes__pass_id__decide_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pass"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Decide"
+      }
+    },
+    "/api/books/{slug}/passes/{pass_id}/retry": {
+      "post": {
+        "operationId": "retry_api_books__slug__passes__pass_id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Retry"
+      }
+    },
+    "/api/books/{slug}/render": {
+      "post": {
+        "operationId": "render_book_api_books__slug__render_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Render Book"
+      }
+    },
+    "/api/books/{slug}/script": {
+      "get": {
+        "operationId": "get_script_api_books__slug__script_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Script"
+      }
+    },
+    "/api/books/{slug}/versions": {
+      "get": {
+        "operationId": "get_versions_api_books__slug__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VersionEntry"
+                  },
+                  "title": "Response Get Versions Api Books  Slug  Versions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Versions"
+      }
+    },
+    "/api/books/{slug}/versions/{n}/restore": {
+      "post": {
+        "operationId": "restore_api_books__slug__versions__n__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "n",
+            "required": true,
+            "schema": {
+              "title": "N",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Restore"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "operationId": "list_jobs_api_jobs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JobSummary"
+                  },
+                  "title": "Response List Jobs Api Jobs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "List Jobs"
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "get": {
+        "operationId": "get_job_api_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Job"
+      }
+    },
+    "/api/jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_job_api_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Cancel Job"
+      }
+    },
+    "/api/jobs/{job_id}/events": {
+      "get": {
+        "operationId": "job_events_api_jobs__job_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Server-sent events: `progress` (a Job without `log`) first on connect, `log` (one JobLogEntry), `done` (the final Job) and then the stream closes; a heartbeat comment every 15 s."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Job Events"
+      }
+    },
+    "/api/jobs/{job_id}/pause": {
+      "post": {
+        "operationId": "pause_job_api_jobs__job_id__pause_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Pause Job"
+      }
+    },
+    "/api/jobs/{job_id}/resume": {
+      "post": {
+        "operationId": "resume_job_api_jobs__job_id__resume_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Resume Job"
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "operationId": "get_settings_api_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Get Settings"
+      },
+      "patch": {
+        "description": "Global settings, so the blast radius of a bad value is every book\ncreated afterwards — ``narrator_engine: \"nonexistent-engine-xyz\"`` was\naccepted, persisted, and silently used to cast the next book's whole\ncast. Checked against the same catalog the line-level\nPATCH uses.",
+        "operationId": "patch_settings_api_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Any error, 4xx or 5xx: one human-readable line in `detail`."
+          }
+        },
+        "summary": "Patch Settings"
+      }
+    }
+  },
+  "x-generated-with": "fastapi 0.133.1, pydantic 2.13.4"
+}
